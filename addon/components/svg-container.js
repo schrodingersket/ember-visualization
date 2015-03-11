@@ -50,7 +50,7 @@ export default Ember.Component.extend({
    */
   resizeHandler: function() {
     this.get('svg')
-      .attr('width', this.get('element').width())
-      .attr('height', this.get('element').height());
+      .attr('width', this.$().width())
+      .attr('height', this.$().height());
   }
 });
