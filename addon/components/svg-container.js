@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 A Digital Edge, LLC
+ */
+
 import Ember from 'ember';
 
 /* global d3 */
@@ -93,7 +97,7 @@ export default Ember.Component.extend({
    * It also calls the svgRender method, which is to be overriden
    * by subclasses.
    */
-  _resizeHandler: function() {
+  _resizeHandler: (function() {
 
     // Set component variables
     //
@@ -104,8 +108,8 @@ export default Ember.Component.extend({
       .attr('width', this.get('width'))
       .attr('height', this.get('height'));
 
-    // Add a call to svgInserted for subclasses to override to add their own functionality.
+    // Add a call to svgRender for subclasses to override to add their own functionality.
     //
-    Ember.run.once(self, 'svgRender');
-  }
+    Ember.run.once(this, 'svgRender');
+  })
 });
