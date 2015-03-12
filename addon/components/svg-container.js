@@ -34,7 +34,7 @@ export default Ember.Component.extend({
 
     // Check the visibility when the window is resized (once per run-loop)
     //
-    $(window).on('resize', function() {
+    Ember.$(window).on('resize', function() {
       return this.Ember.run.once(that, 'resizeHandler');
     });
   }).on('didInsertElement'),
@@ -45,7 +45,7 @@ export default Ember.Component.extend({
    * This is where we unbind our resize handler.
    */
   removeResizeListener: (function() {
-    $(window).off('resize');
+    Ember.$(window).off('resize');
   }).on('willDestroyElement'),
 
   /**
