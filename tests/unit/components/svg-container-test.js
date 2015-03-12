@@ -28,7 +28,6 @@ test('it renders with svg element', function(assert) {
   //
   assert.equal(element.find('svg').width(),
     element.width() - component.get('margin.left') - component.get('margin.right'));
-  console.log(element.width());
 
   assert.equal(element.find('svg').height(),
     element.height() - 4);
