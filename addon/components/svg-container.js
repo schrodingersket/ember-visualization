@@ -5,7 +5,7 @@ import Ember from 'ember';
 /**
  * The expected result of rendering this component is a containing div which has inside
  * of it an SVG element whose size correlates directly to the container's  size. The HTML
- * this is inserted into the DOM is:
+ * that is inserted into the DOM is:
  *
  * `<div class="svg-container">`
  * `  <svg width={container width} height={container height}></svg>`
@@ -32,23 +32,39 @@ export default Ember.Component.extend({
   svg: null,
 
   /**
+   * Holds a reference to this container's current width. Objects which extend this should retrieve
+   * this value via `this.get('width')`. This value is updated whenever the container is resized,
+   * and is meant to be used as a bound property for re-rendering the contents of this component's
+   * SVG element.
+   */
+  width: null,
+
+  /**
+   * Holds a reference to this container's current height. Objects which extend this should retrieve
+   * this value via `this.get('height')`. This value is updated whenever the container is resized,
+   * and is meant to be used as a bound property for re-rendering the contents of this component's
+   * SVG element.
+   */
+  height: null,
+
+  /**
    * Called when the component is to be inserted into the DOM.
    *
    * Renders the SVG element and adds an event handler for window resizing.
    */
-  addResizeListener: (function() {
+  _addResizeListener: (function() {
     this.set('svg', d3.selectAll(this.$()).append('svg:svg'));
 
-    this.get('svg')
-      .attr('width', this.$().width())
-      .attr('height', this.$().height());
+    // Set initial dimension
+    //
+    this._resizeHandler();
 
-    var that = this;
+    var self = this;
 
     // Check the visibility when the window is resized (once per run-loop)
     //
     Ember.$(window).on('resize', function() {
-      return this.Ember.run.once(that, 'resizeHandler');
+      return this.Ember.run.once(self, '_resizeHandler');
     });
   }).on('didInsertElement'),
 
@@ -57,7 +73,7 @@ export default Ember.Component.extend({
    *
    * This is where we unbind our resize handler.
    */
-  removeResizeListener: (function() {
+  _removeResizeListener: (function() {
     Ember.$(window).off('resize');
   }).on('willDestroyElement'),
 
@@ -65,9 +81,15 @@ export default Ember.Component.extend({
    * Handles window resize events to re-render SVG. This method is what provides
    * us with a reponsive SVG window.
    */
-  resizeHandler: function() {
+  _resizeHandler: function() {
+
+    // Set component variables
+    //
+    this.set('width', this.$().width());
+    this.set('height', this.$().height());
+
     this.get('svg')
-      .attr('width', this.$().width())
-      .attr('height', this.$().height());
+      .attr('width', this.get('width'))
+      .attr('height', this.get('height'));
   }
 });
