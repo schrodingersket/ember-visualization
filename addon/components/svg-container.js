@@ -71,10 +71,6 @@ export default Ember.Component.extend({
     Ember.$(window).on('resize', function() {
       return this.Ember.run.once(self, '_resizeHandler');
     });
-
-    // Add a call to svgInserted for subclasses to override to add their own functionality.
-    //
-    Ember.run.once(self, 'svgRender');
   }),
 
   /**
@@ -91,8 +87,11 @@ export default Ember.Component.extend({
   svgRender: function() { },
 
   /**
-   * Handles window resize events to re-render SVG. This method is what provides
-   * us with a reponsive SVG window.
+   * Handles window resize events to re-render SVG.
+   *
+   * This method is what provides us with a responsive SVG window.
+   * It also calls the svgRender method, which is to be overriden
+   * by subclasses.
    */
   _resizeHandler: function() {
 
@@ -104,5 +103,9 @@ export default Ember.Component.extend({
     this.get('svg')
       .attr('width', this.get('width'))
       .attr('height', this.get('height'));
+
+    // Add a call to svgInserted for subclasses to override to add their own functionality.
+    //
+    Ember.run.once(self, 'svgRender');
   }
 });
