@@ -48,6 +48,11 @@ export default Ember.Component.extend({
   height: null,
 
   /**
+   * Defines the margins for this SVG element.
+   */
+  margin: {top: 20, right: 10, bottom: 20, left: 10},
+
+  /**
    * Called when the component is to be inserted into the DOM.
    *
    * Renders the SVG element and adds an event handler for window resizing.
@@ -85,7 +90,7 @@ export default Ember.Component.extend({
 
     // Set component variables
     //
-    this.set('width', this.$().width());
+    this.set('width', this.$().width() - this.get('margin.left') - this.get('margin.right'));
     this.set('height', this.$().height());
 
     this.get('svg')

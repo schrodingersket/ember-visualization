@@ -26,11 +26,18 @@ test('it renders with svg element', function(assert) {
 
   // Verify SVG dimensions are equal to the container's dimensions
   //
-  assert.equal(element.find('svg').width(), element.width());
-  assert.equal(element.find('svg').height(), element.height() - 4);
+  assert.equal(element.find('svg').width(),
+    element.width() - component.get('margin.left') - component.get('margin.right'));
+  console.log(element.width());
+
+  assert.equal(element.find('svg').height(),
+    element.height() - 4);
 
   // Verify that the component's width and height elements were set properly
   //
-  assert.equal(component.get('width'), element.width());
-  assert.equal(component.get('height'), element.height() - 4);
+  assert.equal(component.get('width'),
+    element.width() - component.get('margin.left') - component.get('margin.right'));
+
+  assert.equal(component.get('height'),
+    element.height() - 4);
 });
