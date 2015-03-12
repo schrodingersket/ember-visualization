@@ -2,6 +2,15 @@ import Ember from 'ember';
 
 /* global d3 */
 
+/**
+ * The expected result of rendering this component is a containing div which has inside
+ * of it an SVG element whose size correlates directly to the container's  size. The HTML
+ * this is inserted into the DOM is:
+ *
+ * `<div class="svg-container">`
+ * `  <svg width={container width} height={container height}></svg>`
+ * `</div>
+ */
 export default Ember.Component.extend({
 
   /**
@@ -16,11 +25,15 @@ export default Ember.Component.extend({
   classNames: ['svg-container'],
 
   /**
-   * Holds a reference to this
+   * Holds a reference to the SVG element inside this container. Objects which extend this
+   * should retrieve this element via `this.get('svg')`, and can then call d3's `append` method
+   * to add SVG elements inside of  it.
    */
   svg: null,
 
   /**
+   * Called when the component is to be inserted into the DOM.
+   *
    * Renders the SVG element and adds an event handler for window resizing.
    */
   addResizeListener: (function() {
