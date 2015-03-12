@@ -21,28 +21,32 @@ export default Ember.Component.extend({
   svg: null,
 
   /**
-   * Adds and stores the base svg element for this view
-   *
-   * Be sure to call this._super() when extending this method!
+   * Renders the SVG element and adds an event handler for window resizing.
    */
-  didInsertElement: function() {
+  addResizeListener: (function() {
     this.set('svg', d3.selectAll(this.$()).append('svg:svg'));
 
     this.get('svg')
-        .attr('width', this.$().width())
-        .attr('height', this.$().height());
+      .attr('width', this.$().width())
+      .attr('height', this.$().height());
 
-    Ember.$(window).on('resize', this.resizeHandler.bind(this));
-  },
+    var that = this;
+
+    // Check the visibility when the window is resized (once per run-loop)
+    //
+    $(window).on('resize', function() {
+      return this.Ember.run.once(that, 'resizeHandler');
+    });
+  }).on('didInsertElement'),
 
   /**
    * Called when the component is to be removed from the DOM.
    *
    * This is where we unbind our resize handler.
    */
-  willDestroyElement: function() {
-    Ember.$(window).off('resize', this.resizeHandler);
-  },
+  removeResizeListener: (function() {
+    $(window).off('resize');
+  }).on('willDestroyElement'),
 
   /**
    * Handles window resize events to re-render SVG. This method is what provides
