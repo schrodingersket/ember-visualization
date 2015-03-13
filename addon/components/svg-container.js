@@ -26,7 +26,7 @@ export default Ember.Component.extend({
   /**
    * Class names associated with this view.
    */
-  classNames: ['svg-container'],
+  classNames: ['ev-svg-container'],
 
   /**
    * Holds a reference to the SVG element inside this container. Objects which extend this
@@ -36,25 +36,26 @@ export default Ember.Component.extend({
   svg: null,
 
   /**
-   * Holds a reference to this container's current width. Objects which extend this should retrieve
-   * this value via `this.get('width')`. This value is updated whenever the container is resized,
-   * and is meant to be used as a bound property for re-rendering the contents of this component's
-   * SVG element.
+   * View box height; returns the viewport width for this element, and functions as the effective width
+   * for the root SVG element. Note that this does NOT correspond to the width in pixels!
+   *
+   * Subclasses should use this attribute (which can be overridden) to position their elements relative to the
+   * viewport to ensure proper scaling behavior.
+   *
+   * Returns 100 by default.
    */
-  width: null,
+  width: 100,
 
   /**
-   * Holds a reference to this container's current height. Objects which extend this should retrieve
-   * this value via `this.get('height')`. This value is updated whenever the container is resized,
-   * and is meant to be used as a bound property for re-rendering the contents of this component's
-   * SVG element.
+   * View box height; returns the viewport height for this element, and functions as the effective height
+   * for the root SVG element. Note that this does NOT correspond to the width in pixels!
+   *
+   * Subclasses should use this attribute (which can be overridden) to position their elements relative to the
+   * viewport to ensure proper scaling behavior.
+   *
+   * returns 162 by default.
    */
-  height: null,
-
-  /**
-   * Defines the margins for this SVG element.
-   */
-  margin: {top: 20, right: 10, bottom: 20, left: 10},
+  height: 162,
 
   /**
    * Called when the component is to be inserted into the DOM.
@@ -62,54 +63,24 @@ export default Ember.Component.extend({
    * Renders the SVG element and adds an event handler for window resizing.
    */
   didInsertElement: (function() {
-    this.set('svg', d3.selectAll(this.$()).append('svg:svg'));
+    this.set('svg', d3.selectAll(this.$()).append('svg:svg')
+      .attr('class', 'ev-svg')
+      .attr('width', '100%')
+      .attr('viewBox', '0 0 ' + this.get('width') + ' ' + this.get('height')));
 
-    // Set initial dimension
-    //
-    this._resizeHandler();
-
-    var self = this;
-
-    // Check the visibility when the window is resized (once per run-loop)
-    //
-    Ember.$(window).on('resize', function() {
-      return this.Ember.run.once(self, '_resizeHandler');
-    });
-  }),
-
-  /**
-   * Called when the component is to be removed from the DOM.
-   *
-   * This is where we unbind our resize handler.
-   */
-  willDestroyElement: (function() {
-    Ember.$(window).off('resize');
-  }),
-
-  // Placeholder function so that we don't break things if it's not overriden by a subclass.
-  //
-  svgRender: function() { },
-
-  /**
-   * Handles window resize events to re-render SVG.
-   *
-   * This method is what provides us with a responsive SVG window.
-   * It also calls the svgRender method, which is to be overriden
-   * by subclasses.
-   */
-  _resizeHandler: (function() {
-
-    // Set component variables
-    //
-    this.set('width', this.$().width() - this.get('margin.left') - this.get('margin.right'));
-    this.set('height', this.$().height());
-
-    this.get('svg')
-      .attr('width', this.get('width'))
-      .attr('height', this.get('height'));
-
-    // Add a call to svgRender for subclasses to override to add their own functionality.
+    // Render SVG elements into the base element.
     //
     Ember.run.once(this, 'svgRender');
-  })
+  }),
+
+  /**
+   * Called when the element's been inserted into the DOM.
+   *
+   * This function is to be overridden by subclasses in order
+   * to append SVG elements to the base element.
+   *
+   * Subclasses can bind this to properties to render SVG elements
+   * when a property of interest changes.
+   */
+  svgRender: function() { }
 });
