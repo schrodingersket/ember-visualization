@@ -9,7 +9,7 @@ moduleForComponent('svg-container', {
 });
 
 test('it renders with svg element', function(assert) {
-  assert.expect(10);
+  assert.expect(11);
 
   // Creates the component instance
   //
@@ -36,6 +36,17 @@ test('it renders with svg element', function(assert) {
 
   // Verify that the component's width and height elements were set properly
   //
-  assert.equal(component.get('width'), 100);
-  assert.equal(component.get('height'), 162);
+  assert.equal(component.get('width'), 600);
+  assert.equal(component.get('height'), 400);
+
+  // Update view port
+  //
+  component.set('width', 1200);
+  component.set('height', 800);
+
+  // Verify SVG viewBox was set correctly
+  //
+  assert.equal(element.find('svg')[0].getAttribute('viewBox'),
+    '0 0 1200 800', 'svg element contains correct `viewBox` attribute after height and width update');
+
 });
