@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 A Digital Edge, LLC
+ * Copyright (c) 2015 Urbane Innovation, LLC
  */
 
 import Ember from 'ember';
@@ -42,7 +42,7 @@ export default Ember.Component.extend({
    * Subclasses should use this attribute (which can be overridden) to position their elements relative to the
    * viewport to ensure proper scaling behavior.
    *
-   * Returns 809 by default.
+   * Returns 600 by default.
    */
   width: 600,
 
@@ -53,7 +53,7 @@ export default Ember.Component.extend({
    * Subclasses should use this attribute (which can be overridden) to position their elements relative to the
    * viewport to ensure proper scaling behavior.
    *
-   * returns 500 by default.
+   * returns 400 by default.
    */
   height: 400,
 
