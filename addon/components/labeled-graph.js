@@ -80,7 +80,11 @@ export default SvgContainer.extend({
   /**
    * Contains scale types that are valid for this component.
    */
-  _scaleTypes: ['linear', 'time', 'log'],
+  _scaleTypes: {
+    linear: 'linear',
+    time: 'time',
+    log: 'log'
+  },
 
   /**
    * Returns a d3 graph the corresponds to the provided `scaleType`, `domain`, and `range`.
@@ -102,21 +106,21 @@ export default SvgContainer.extend({
 
     options = options || {};
 
-    if (scaleType === self.get('_scaleTypes')[0]) {
+    if (scaleType === self.get('_scaleTypes.linear')) {
       // Linear
       //
       return d3.scale.linear()
         .domain(domain)
         .range(range);
     }
-    else if (scaleType === self.get('_scaleTypes')[1]) {
+    else if (scaleType === self.get('_scaleTypes.time')) {
       // Time
       //
       return d3.time.scale()
         .domain(domain)
         .range(range);
     }
-    else if (scaleType === self.get('_scaleTypes')[2]) {
+    else if (scaleType === self.get('_scaleTypes.log')) {
 
       // Default to base 10 if not otherwise specified
       //
