@@ -78,50 +78,36 @@ export default SvgContainer.extend({
   yScale: 'linear',
 
   /**
-   * Contains scale types that are valid for this component.
+   * Specifies the base to use for logarithmic axis scaling.
+   *
+   * Defaults to 10.
    */
-  _scaleTypes: {
-    linear: 'linear',
-    time: 'time',
-    log: 'log'
-  },
+  base: 10,
 
   /**
-   * Returns a d3 graph the corresponds to the provided `scaleType`, `domain`, and `range`.
+   * Contains scales that are valid for this component.\
    *
    * D3 expects a scaling function to be provided to it when creating axes and plots;
    * scaling functions map a provided set of values to the axis/plot domain.
    *
-   * Currently, the `options` variable is used only to specify the base for a logarithmic scale.
-   * If it's not defined and a logarithmic scale  is requested, the scale will default to base 10.
-   *
-   * @param self Reference to this labeled-graph instance
-   * @param scaleType String representing the desired scale type
    * @param domain Desired scale domain
    * @param range Desired scale range
    * @param options Contains other options.
+   *
    * @private
    */
-  _scaleForType: function(self, scaleType, domain, range, options) {
-
-    options = options || {};
-
-    if (scaleType === self.get('_scaleTypes.linear')) {
-      // Linear
-      //
+  _scales: {
+    linear: function(domain, range) {
       return d3.scale.linear()
         .domain(domain)
         .range(range);
-    }
-    else if (scaleType === self.get('_scaleTypes.time')) {
-      // Time
-      //
+    },
+    time: function(domain, range) {
       return d3.time.scale()
         .domain(domain)
         .range(range);
-    }
-    else if (scaleType === self.get('_scaleTypes.log')) {
-
+    },
+    log: function(domain, range, options) {
       // Default to base 10 if not otherwise specified
       //
       options.base = options.base || 10;
@@ -178,10 +164,11 @@ export default SvgContainer.extend({
    *
    */
   _xScale: (function(self) {
-    return self.get('_scaleForType')(self,
-      self.get('xScale'),
+
+    return self.get('_scales.' + self.get('xScale'))(
       self.get('_xDomain')(self),
-      [0, self.get('width') - self.get('margin.left')(self) - self.get('margin.right')() - 5]);
+      [0, self.get('width') - self.get('margin.left')(self) - self.get('margin.right')() - 5],
+      { base: self.get('base') });
   }),
 
   /**
@@ -189,10 +176,11 @@ export default SvgContainer.extend({
    *
    */
   _yScale: (function(self) {
-    return self.get('_scaleForType')(self,
-      self.get('yScale'),
+
+    return self.get('_scales.' + self.get('yScale'))(
       self.get('_yDomain')(self),
-      [self.get('height') - self.get('margin.bottom')(self) - self.get('margin.top')(self) - 5, 0]);
+      [self.get('height') - self.get('margin.bottom')(self) - self.get('margin.top')(self) - 5, 0],
+      { base: self.get('base') });
   }),
 
   /**

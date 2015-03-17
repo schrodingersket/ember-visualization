@@ -103,7 +103,7 @@ test('creates correct domains for `dataSource`', function(assert) {
 
 // Linear scale
 //
-test('`_scaleForType` returns correct linear scale', function(assert) {
+test('`_scales` returns correct linear scale', function(assert) {
   assert.expect(2);
 
   // Initialize component
@@ -129,7 +129,7 @@ test('`_scaleForType` returns correct linear scale', function(assert) {
 
   // Get result of linear scaling
   //
-  var scalingResult = component.get('_scaleForType')(component, 'linear', testDomain, testRange)(x);
+  var scalingResult = component.get('_scales.linear')(testDomain, testRange)(x);
 
   assert.ok(scalingResult, 'result of linear scaling not null');
   assert.equal(scalingResult, linearScale(x), 'scaling results equal');
@@ -137,7 +137,7 @@ test('`_scaleForType` returns correct linear scale', function(assert) {
 
 // Time scale
 //
-test('`_scaleForType` returns correct time scale', function(assert) {
+test('`_scales` returns correct time scale', function(assert) {
   assert.expect(2);
 
   // Initialize component
@@ -163,7 +163,7 @@ test('`_scaleForType` returns correct time scale', function(assert) {
 
   // Get result of time scaling
   //
-  var scalingResult = component.get('_scaleForType')(component, 'time', testDomain, testRange)(x);
+  var scalingResult = component.get('_scales.time')(testDomain, testRange)(x);
 
   assert.ok(scalingResult, 'result of time scaling not null');
   assert.equal(scalingResult, timeScale(x), 'scaling results equal');
@@ -171,7 +171,7 @@ test('`_scaleForType` returns correct time scale', function(assert) {
 
 // Logarithmic scale
 //
-test('`_scaleForType` returns correct logarithmic scale', function(assert) {
+test('`_scales` returns correct logarithmic scale', function(assert) {
   assert.expect(2);
 
   // Initialize component
@@ -199,7 +199,7 @@ test('`_scaleForType` returns correct logarithmic scale', function(assert) {
 
   // Get result of logarithmic scaling
   //
-  var scalingResult = component.get('_scaleForType')(component, 'log', testDomain, testRange, {base: testBase})(x);
+  var scalingResult = component.get('_scales.log')(testDomain, testRange, { base: testBase })(x);
 
   assert.ok(scalingResult, 'result of logarithmic scaling not null');
   assert.equal(scalingResult, logScale(x), 'scaling results equal');
@@ -207,7 +207,7 @@ test('`_scaleForType` returns correct logarithmic scale', function(assert) {
 
 // `xScale` maps correctly to `margin`, `height`, and `width`
 //
-test('returns scale with correct domain and range for `xScale`', function(assert) {
+test('returns scale with correct domain and range for `_xScale`', function(assert) {
   assert.expect(2);
 
   // Initialize component
@@ -239,7 +239,7 @@ test('returns scale with correct domain and range for `xScale`', function(assert
 
   // Get expected function
   //
-  var expectedScale = component.get('_scaleForType')(component, 'linear', testDomain, testRange);
+  var expectedScale = component.get('_scales.linear')(testDomain, testRange);
 
   // Get actual function
   //
@@ -283,7 +283,7 @@ test('returns scale with correct domain and range for `_yScale`', function(asser
 
   // Get expected function
   //
-  var expectedScale = component.get('_scaleForType')(component, 'linear', testDomain, testRange);
+  var expectedScale = component.get('_scales.linear')(testDomain, testRange);
 
   // Get actual function
   //
