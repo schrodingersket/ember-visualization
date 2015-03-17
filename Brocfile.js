@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Urbane Innovation, LLC
+ */
+
 /* jshint node: true */
 /* global require, module */
 

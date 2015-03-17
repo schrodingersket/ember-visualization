@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Urbane Innovation, LLC
+ */
+
 import Resolver from 'ember/resolver';
 import config from '../../config/environment';
 

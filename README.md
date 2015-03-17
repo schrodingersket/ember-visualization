@@ -1,6 +1,17 @@
-# Ember-visualization
+Ember Visualization
+===================
+
+Comprehensive integration between Ember.js and d3.
 
 This README outlines the details of collaborating on this Ember addon.
+
+## Features
+
+- Provides responsive SVG charts and graphs inside extensible Ember components.
+
+### Documentation 
+
+This component library runs as an ember-cli application itself, which contains interactive component demos.
 
 ## Installation
 

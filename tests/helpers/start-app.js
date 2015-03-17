@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Urbane Innovation, LLC
+ */
+
 import Ember from 'ember';
 import Application from '../../app';
 import Router from '../../router';

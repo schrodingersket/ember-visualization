@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2015 Urbane Innovation, LLC
+ */
+
 import {
   moduleForComponent,
   test
@@ -36,8 +40,8 @@ test('it renders with svg element', function(assert) {
 
   // Verify that the component's width and height elements were set properly
   //
-  assert.equal(component.get('width'), 600);
-  assert.equal(component.get('height'), 400);
+  assert.equal(component.get('width'), 600, 'width was set correctly');
+  assert.equal(component.get('height'), 400, 'height was set correctly');
 
   // Update view port
   //
