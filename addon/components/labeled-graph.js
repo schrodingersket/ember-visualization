@@ -18,16 +18,16 @@ export default SvgContainer.extend({
    */
   margin: {
     left: function(self) {
-      return self.get('width')/10; // Left margin set to 10%
+      return self.get('width')/20; // Left margin set to 5%
     },
     right: function() {
       return 0;
     },
     bottom: function(self) {
-      return self.get('height')/20; // Bottom margin set to 5%
+      return self.get('height')/20; // Bottom margin set to 2%
     },
-    top: function() {
-      return 0;
+    top: function(self) {
+      return self.get('height')/50; // Bottom margin set to 2%
     }
   },
 
@@ -63,7 +63,7 @@ export default SvgContainer.extend({
    *
    * Default type is `linear`
    */
-  xScale: 'linear',
+  xScaleType: 'linear',
 
   /**
    * Specifies the type of scaling to be used when generating the chart.
@@ -75,7 +75,7 @@ export default SvgContainer.extend({
    *
    * Default type is `linear`
    */
-  yScale: 'linear',
+  yScaleType: 'linear',
 
   /**
    * Specifies the base to use for logarithmic axis scaling.
@@ -85,7 +85,66 @@ export default SvgContainer.extend({
   base: 10,
 
   /**
-   * Contains scales that are valid for this component.\
+   * Specifies the JSON object value from `dataSource` to use for the x-axis.
+   *
+   * Defaults to "x."
+   */
+  xAttr: 'x',
+
+  /**
+   * Specifies the JSON object value from `dataSource` to use for the y-axis.
+   *
+   * Defaults to "y."
+   */
+  yAttr: 'y',
+
+  /**
+   * Closure which returns a d3 scaling function corresponding to `xScale`.
+   */
+  xScale: function(self) {
+
+    return self.get('_scales.' + self.get('xScaleType'))(
+      self.get('_xDomain')(self),
+      [self.get('margin.left')(self), self.get('width') - self.get('margin.left')(self) - self.get('margin.right')()],
+      { base: self.get('base') });
+  },
+
+  /**
+   * Closure which returns a d3 scaling function corresponding to `yScaleType`.
+   *
+   */
+  yScale: function(self) {
+
+    return self.get('_scales.' + self.get('yScaleType'))(
+      self.get('_yDomain')(self),
+      [self.get('height') - self.get('margin.bottom')(self), self.get('margin.top')(self)],
+      { base: self.get('base') });
+  },
+
+  /**
+   * Acts as the base resource for graphs to be rendered from.
+   *
+   * Assuming that this instance's `xAttr` and `yAttr` attributes are set to
+   * "x" and "y" respectively, it should take the following form:
+   *
+   * ```
+   *  [
+   *    {x: x_1, y: y_1},
+   *    {x: y_2, y: y_2},
+   *    .
+   *    .
+   *    .
+   *    {x: y_n, y: y_n}
+   *  ]
+   * ```
+   *
+   * ...where x_i and y_i are the x and y values at each index.
+   *
+   */
+  dataSource: [],
+
+  /**
+   * Contains scales that are valid for this component.
    *
    * D3 expects a scaling function to be provided to it when creating axes and plots;
    * scaling functions map a provided set of values to the axis/plot domain.
@@ -131,10 +190,14 @@ export default SvgContainer.extend({
    */
   _xDomain: function(self) {
 
-    var data = self.get('dataSource') || [{x:0, y:0}];
+    var defaultData = [{}];
+    defaultData[0][self.get('xAttr')] = 0;
+    defaultData[0][self.get('yAttr')] = 0;
+
+    var data = self.get('dataSource') || defaultData;
 
     var values = data.map(function(d) {
-      return d.x;
+      return d[self.get('xAttr')];
     });
 
     return d3.extent(values);
@@ -150,38 +213,18 @@ export default SvgContainer.extend({
    */
   _yDomain: function(self) {
 
-    var data = self.get('dataSource') || [{x:0, y:0}];
+    var defaultData = [{}];
+    defaultData[0][self.get('xAttr')] = 0;
+    defaultData[0][self.get('yAttr')] = 0;
+
+    var data = self.get('dataSource') || defaultData;
 
     var values = data.map(function(d) {
-      return d.y;
+      return d[self.get('yAttr')];
     });
 
     return d3.extent(values);
   },
-
-  /**
-   * Closure which returns a d3 scaling function corresponding to `xScale`.
-   *
-   */
-  _xScale: (function(self) {
-
-    return self.get('_scales.' + self.get('xScale'))(
-      self.get('_xDomain')(self),
-      [0, self.get('width') - self.get('margin.left')(self) - self.get('margin.right')() - 5],
-      { base: self.get('base') });
-  }),
-
-  /**
-   * Closure which returns a d3 scaling function corresponding to `yScale`.
-   *
-   */
-  _yScale: (function(self) {
-
-    return self.get('_scales.' + self.get('yScale'))(
-      self.get('_yDomain')(self),
-      [self.get('height') - self.get('margin.bottom')(self) - self.get('margin.top')(self) - 5, 0],
-      { base: self.get('base') });
-  }),
 
   /**
    * Renders the graph title. Adds an additional top margin if the title exists; otherwise, sets it to zero. Margin
@@ -192,7 +235,7 @@ export default SvgContainer.extend({
   _renderTitle: function() {
     if (this.get('title')) {
       this.set('margin.top', function(self) {
-        return self.get('height')/20; // Top margin set to 5%);
+        return self.get('height')/10; // Top margin set to 10%);
       });
 
       var $title = this.get('svg').select('text.ev-title');
@@ -200,11 +243,11 @@ export default SvgContainer.extend({
       if ($title.empty()) {
         this.get('svg')
           .append('svg:text')
-          .attr('class', 'ev-title')
-          .attr('x', this.get('width')/2)
-          .attr('y', this.get('margin.top')(this)/2)
-          .attr('text-anchor', 'middle')
-          .text(this.get('title'));
+            .attr('class', 'ev-title')
+            .attr('x', this.get('width')/2)
+            .attr('y', this.get('margin.top')(this)/2)
+            .attr('text-anchor', 'middle')
+            .text(this.get('title'));
       }
       else {
         $title
@@ -221,8 +264,8 @@ export default SvgContainer.extend({
         .select('text.ev-title')
         .remove();
 
-      this.set('margin.top', function() {
-        return 0;
+      this.set('margin.top', function(self) {
+        return self.get('height')/50; // Bottom margin set to 2%
       });
     }
   }.observes('title'),
@@ -244,16 +287,15 @@ export default SvgContainer.extend({
       if ($xAxisTitle.empty()) {
         this.get('svg')
           .append('svg:text')
-          .transition()
-          .attr('class', 'ev-axis-title ev-x-axis-title')
-          .attr('x', (this.get('width') - this.get('margin.left')(this) - this.get('margin.right')(this))/2)
-          .attr('y', this.get('height'))
-          .text(this.get('xAxisTitle'));
+            .attr('class', 'ev-axis-title ev-x-axis-title')
+            .attr('text-anchor', 'middle')
+            .attr('x', (this.get('width') + this.get('margin.left')(this) - this.get('margin.right')(this))/2)
+            .attr('y', this.get('height'))
+            .text(this.get('xAxisTitle'));
       }
       else {
         $xAxisTitle
-          .transition()
-          .attr('x', (this.get('width') - this.get('margin.left')(this) - this.get('margin.right')(this))/2)
+          .attr('x', (this.get('width') + this.get('margin.left')(this) - this.get('margin.right')(this))/2)
           .attr('y', this.get('height'))
           .text(this.get('xAxisTitle'));
       }
@@ -263,11 +305,10 @@ export default SvgContainer.extend({
       //
       this.get('svg')
         .select('text.ev-axis-title.ev-x-axis-title')
-        .transition()
         .remove();
 
       this.set('margin.bottom', function(self) {
-        return self.get('height')/20; // Bottom margin set to 5%);
+        return self.get('height')/20; // Bottom margin set to 5%;
       });
     }
   }.observes('xAxisTitle'),
@@ -279,9 +320,10 @@ export default SvgContainer.extend({
    * Observes `yAxisTitle`
    */
   _renderYAxisTitle: function() {
+
     if (this.get('yAxisTitle')) {
       this.set('margin.left', function(self) {
-        return self.get('width')/5; // Left margin set to 20%);
+        return self.get('width')/10; // Left margin set to 10%);
       });
 
       var $yAxisTitle = this.get('svg').select('text.ev-axis-title.ev-y-axis-title');
@@ -289,18 +331,17 @@ export default SvgContainer.extend({
       if ($yAxisTitle.empty()) {
         this.get('svg')
           .append('svg:text')
-          .transition()
-          .attr('class', 'ev-axis-title ev-y-axis-title')
-          .attr('transform', 'rotate(-90)')
-          .attr('x', -(this.get('height') - this.get('margin.top')(this) - this.get('margin.bottom')(this))/2)
-          .attr('y', this.get('margin.left')(this)/20) // 5%
-          .text(this.get('yAxisTitle'));
+            .attr('class', 'ev-axis-title ev-y-axis-title')
+            .attr('transform', 'rotate(-90)')
+            .attr('text-anchor', 'middle')
+            .attr('x', -(this.get('height') + this.get('margin.top')(this) - this.get('margin.bottom')(this))/2)
+            .attr('y', this.get('margin.left')(this)/4) // 25% of left margin
+            .text(this.get('yAxisTitle'));
       }
       else {
         $yAxisTitle
-          .transition()
-          .attr('x', -(this.get('height') - this.get('margin.top')(this) - this.get('margin.bottom')(this))/2)
-          .attr('y', this.get('margin.left')(this)/20) // 5%
+          .attr('x', -(this.get('height') + this.get('margin.top')(this) - this.get('margin.bottom')(this))/2)
+          .attr('y', this.get('margin.left')(this)/4) // 25% of left margin
           .text(this.get('yAxisTitle'));
       }
     }
@@ -309,11 +350,10 @@ export default SvgContainer.extend({
       //
       this.get('svg')
         .select('text.ev-axis-title.ev-y-axis-title')
-        .transition()
         .remove();
 
       this.set('margin.left', function(self) {
-        return self.get('width')/10; // Left margin set to 10%);
+        return self.get('width')/20; // Left margin set to 5%);
       });
     }
   }.observes('yAxisTitle'),
@@ -333,24 +373,23 @@ export default SvgContainer.extend({
       var $axis = svg.select('g.ev-axis.ev-x-axis');
 
       if ($axis.empty()) {
-        svg.append('svg:g')
-          .attr('class', 'ev-axis ev-x-axis')
-          .transition()
-          .attr('transform', 'translate(' + this.get('margin.left')(this) + ',' + (this.get('height') - this.get('margin.bottom')(this)) + ')')
-          .call(d3.svg.axis()
-            .scale(this.get('_xScale')(this))
-            .orient('bottom'));
+        svg
+          .append('svg:g')
+            .attr('class', 'ev-axis ev-x-axis')
+            .attr('transform', 'translate(0,' + (this.get('height') - this.get('margin.bottom')(this)) + ')')
+            .call(d3.svg.axis()
+              .scale(this.get('xScale')(this))
+              .orient('bottom'));
       }
       else {
         $axis
-          .transition()
-          .attr('transform', 'translate(' + this.get('margin.left')(this) + ',' + (this.get('height') - this.get('margin.bottom')(this)) + ')')
+          .attr('transform', 'translate(0,' + (this.get('height') - this.get('margin.bottom')(this)) + ')')
           .call(d3.svg.axis()
-            .scale(this.get('_xScale')(this))
+            .scale(this.get('xScale')(this))
             .orient('bottom'));
       }
     }
-  }.observes('margin.left', 'margin.bottom', 'height'),
+  }.observes('dataSource.[]', 'margin.left', 'margin.bottom', 'margin.top', 'margin.right', 'height'),
 
   /**
    * Renders the y-axis. Since this function observes variables, `this` will refer to the instance whose function is
@@ -369,22 +408,21 @@ export default SvgContainer.extend({
       var $axis = svg.select('g.ev-axis.ev-y-axis');
 
       if ($axis.empty()) {
-        svg.append('svg:g')
-          .attr('class', 'ev-axis ev-y-axis')
-          .transition()
-          .attr('transform', 'translate(' + this.get('margin.left')(this) + ',' + (this.get('margin.top')(this) + 5) + ')')
-          .call(d3.svg.axis()
-            .scale(this.get('_yScale')(this))
-            .orient('left'));
+        svg
+          .append('svg:g')
+            .attr('class', 'ev-axis ev-y-axis')
+            .attr('transform', 'translate(' + this.get('margin.left')(this) + ',0)')
+            .call(d3.svg.axis()
+              .scale(this.get('yScale')(this))
+              .orient('left'));
       }
       else {
         $axis
-          .transition()
-          .attr('transform', 'translate(' + this.get('margin.left')(this) + ',' + (this.get('margin.top')(this) + 5) + ')')
+          .attr('transform', 'translate(' + this.get('margin.left')(this) + ',0)')
           .call(d3.svg.axis()
-            .scale(this.get('_yScale')(this))
+            .scale(this.get('yScale')(this))
             .orient('left'));
       }
     }
-  }.observes('margin.left', 'margin.top')
+  }.observes('dataSource.[]', 'margin.left', 'margin.top', 'margin.bottom', 'margin.right')
 });

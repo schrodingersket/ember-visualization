@@ -1,0 +1,28 @@
+/*
+ * Copyright (c) 2015 Urbane Innovation, LLC
+ */
+
+/***************/
+/* SVG Styling */
+/***************/
+
+.ev-axis path,
+.ev-axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+
+.ev-axis text {
+  font-family: sans-serif;
+  font-size: 11px;
+}
+
+.ev-title  {
+  font-size: 16px;
+}
+
+.ev-axis-title {
+  font-weight: bold;
+  font-size: 11px;
+}
