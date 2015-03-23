@@ -29,6 +29,7 @@ moduleForComponent('labeled-graph', {
 // Render
 //
 test('it renders', function(assert) {
+
   assert.expect(2);
 
   // Initialize component
@@ -45,7 +46,8 @@ test('it renders', function(assert) {
 // Initialization
 //
 test('margins initialize correctly', function(assert) {
-  assert.expect(2);
+
+  assert.expect(4);
 
   // Initialize component
   //
@@ -53,11 +55,17 @@ test('margins initialize correctly', function(assert) {
 
   // Verify margins were rendered correctly
   //
-  assert.equal(component.get('margin.left')(component), component.get('width')/10,
-    'margin.left equal to 10% of width');
+  assert.equal(component.get('margin.left')(component), component.get('width')/20,
+    'margin.left equal to 5% of width');
 
   assert.equal(component.get('margin.bottom')(component), component.get('height')/20,
     'margin.bottom equal to 5% of height');
+
+  assert.equal(component.get('margin.top')(component), component.get('height')/50,
+    'margin.top equal to 2% of height');
+
+  assert.equal(component.get('margin.right')(component), 0,
+    'margin.right equal to 0');
 });
 
 // Domains
@@ -230,12 +238,12 @@ test('returns scale with correct domain and range for `_xScale`', function(asser
 
   // Set scaleType
   //
-  component.set('xScale', 'linear');
+  component.set('xScaleType', 'linear');
 
   // Fetch domain and range corresponding to `dataSource`
   //
   var testDomain = component.get('_xDomain')(component);
-  var testRange = [0, component.get('width') - component.get('margin.left')(component) - component.get('margin.right')() - 5];
+  var testRange = [component.get('margin.left')(component), component.get('width') - component.get('margin.left')(component) - component.get('margin.right')()];
 
   // Get expected function
   //
@@ -243,7 +251,7 @@ test('returns scale with correct domain and range for `_xScale`', function(asser
 
   // Get actual function
   //
-  var actualScale = component.get('_xScale')(component);
+  var actualScale = component.get('xScale')(component);
 
   assert.ok(actualScale(x), 'result of logarithmic scaling not null');
   assert.equal(actualScale(x), expectedScale(x), 'scaling results equal');
@@ -274,12 +282,12 @@ test('returns scale with correct domain and range for `_yScale`', function(asser
 
   // Set scaleType
   //
-  component.set('yScale', 'linear');
+  component.set('yScaleType', 'linear');
 
   // Fetch domain and range corresponding to `dataSource`
   //
   var testDomain = component.get('_yDomain')(component);
-  var testRange = [component.get('height') - component.get('margin.bottom')(component) - component.get('margin.top')(component) - 5, 0];
+  var testRange = [component.get('height') - component.get('margin.bottom')(component), component.get('margin.top')(component)];
 
   // Get expected function
   //
@@ -287,7 +295,7 @@ test('returns scale with correct domain and range for `_yScale`', function(asser
 
   // Get actual function
   //
-  var actualScale = component.get('_yScale')(component);
+  var actualScale = component.get('yScale')(component);
 
   assert.ok(actualScale(x), 'result of logarithmic scaling not null');
   assert.equal(actualScale(x), expectedScale(x), 'scaling results equal');
@@ -355,19 +363,19 @@ test('x-axis title renders correctly when `xAxisTitle` variable is set, and is r
 
     // Verify translation
     //
-    assert.equal($xAxisTitle.attr('x'), (component.get('width') - component.get('margin.left')(component) - component.get('margin.right')(component))/2,
+    assert.equal($xAxisTitle.attr('x'), (component.get('width') + component.get('margin.left')(component) - component.get('margin.right')(component))/2,
       'x axis title translated horizontally correctly');
     assert.equal($xAxisTitle.attr('y'), component.get('height'),
       'x axis title translated horizontally correctly');
 
     // Verify bottom margin change
     //
-    assert.equal(component.get('margin.bottom')(component), component.get('height')/10, 'left margin updated after x-axis title added');
+    assert.equal(component.get('margin.bottom')(component), component.get('height')/10, 'bottom margin updated after x-axis title added');
 
     // Reset x-axis title
     //
     component.set('xAxisTitle', '');
-  }, 300); // Default time period for d3 transitions is 250ms, so we wait for 300.
+  }, 0); // Default time period for d3 transitions is 250ms, so we wait for 300.
 
   // Verify that the x-axis title was rendered after transition period.
   //
@@ -375,7 +383,7 @@ test('x-axis title renders correctly when `xAxisTitle` variable is set, and is r
     assert.equal(element.find('text.ev-axis-title.ev-x-axis-title').text(), '', 'x-axis title removed');
 
     assert.equal(component.get('margin.bottom')(component), component.get('height')/20, 'bottom margin reset after x-axis title removed');
-  }, 600); // Default time period for d3 transitions is 250ms, so we wait for 600 for two.
+  }, 100); // Default time period for d3 transitions is 250ms, so we wait for 600 for two.
 
   wait(); // For Ember.run to complete execution
 });
@@ -410,27 +418,27 @@ test('y-axis title renders correctly when `yAxisTitle` variable is set, and is r
 
     // Verify translation
     //
-    assert.equal($yAxisTitle.attr('x'), -(component.get('height') - component.get('margin.top')(component) - component.get('margin.bottom')(component))/2,
+    assert.equal($yAxisTitle.attr('x'), -(component.get('height') + component.get('margin.top')(component) - component.get('margin.bottom')(component))/2,
       'y axis title translated horizontally correctly');
-    assert.equal($yAxisTitle.attr('y'), component.get('margin.left')(component)/20,
+    assert.equal($yAxisTitle.attr('y'), component.get('margin.left')(component)/4,
       'y axis title translated vertically correctly');
 
     // Verify left margin change
     //
-    assert.equal(component.get('margin.left')(component), component.get('width')/5, 'left margin updated after x-axis title added');
+    assert.equal(component.get('margin.left')(component), component.get('width')/10, 'left margin updated after x-axis title added');
 
     // Reset y-axis title
     //
     component.set('yAxisTitle', '');
-  }, 300); // Default time period for d3 transitions is 250ms, so we wait for 300.
+  }, 0); // Default time period for d3 transitions is 250ms, so we wait for 300.
 
   // Verify that y-axis title was removed after transition period.
   //
   Ember.run.later(function(){
     assert.equal(element.find('text.ev-axis-title.ev-y-axis-title').text(), '', 'y-axis title removed');
 
-    assert.equal(component.get('margin.left')(component), component.get('width')/10, 'left margin reset after y-axis title removed');
-  }, 600); // Default time period for d3 transitions is 250ms, so we wait for 600 for two.
+    assert.equal(component.get('margin.left')(component), component.get('width')/20, 'left margin reset after y-axis title removed');
+  }, 100); // Default time period for d3 transitions is 250ms, so we wait for 600 for two.
 
   wait(); // For Ember.run to complete execution
 });
@@ -465,10 +473,10 @@ test('x-axis renders with correct translation', function(assert) {
 
     var $xAxis = element.find('g.ev-axis.ev-x-axis');
 
-    assert.equal($xAxis.attr('transform'), 'translate(' + component.get('margin.left')(component) + ',' + (component.get('height') - component.get('margin.bottom')(component)) + ')',
+    assert.equal($xAxis.attr('transform'), 'translate(0,' + (component.get('height') - component.get('margin.bottom')(component)) + ')',
       'x-axis translated correctly on render');
 
-  }, 300); // Default time period for d3 transitions is 250ms, so we wait for 300.
+  }, 0); // Default time period for d3 transitions is 250ms, so we wait for 300.
 
   wait(); // For Ember.run to complete execution
 });
@@ -503,10 +511,10 @@ test('y-axis renders with correct translation', function(assert) {
 
     var $yAxis = element.find('g.ev-axis.ev-y-axis');
 
-    assert.equal($yAxis.attr('transform'), 'translate(' + component.get('margin.left')(component) + ',' + (component.get('margin.top')(component) + 5) + ')',
+    assert.equal($yAxis.attr('transform'), 'translate(' + component.get('margin.left')(component) + ',0)',
       'y-axis translated correctly on render');
 
-  }, 300); // Default time period for d3 transitions is 250ms, so we wait for 300.
+  }, 0); // Default time period for d3 transitions is 250ms, so we wait for 300.
 
   wait(); // For Ember.run to complete execution
 });

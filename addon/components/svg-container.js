@@ -67,11 +67,13 @@ export default Ember.Component.extend({
       .attr('class', 'ev-svg')
       .attr('width', '100%'));
 
-    Ember.run.once(this, '_updateViewPort');
+    // Initial viewport update
+    //
+    Ember.run.once(this, '_updateViewPort', this);
 
     // Render SVG elements into the base element.
     //
-    Ember.run.once(this, 'svgRender');
+    Ember.run.once(this, 'svgRender', this);
   }).on('didInsertElement'),
 
   /**
@@ -79,8 +81,8 @@ export default Ember.Component.extend({
    *
    * Observes `width` and `height`
    */
-  _updateViewPort: function() {
-    this.get('svg').attr('viewBox', '0 0 ' + this.get('width') + ' ' + this.get('height'));
+  _updateViewPort: function(self) {
+    self.get('svg').attr('viewBox', '0 0 ' + self.get('width') + ' ' + self.get('height'));
   }.observes('width', 'height'),
 
   /**
