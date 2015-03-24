@@ -20,13 +20,15 @@ export default LabeledGraph.extend({
     self._renderTitle();
     self._renderXAxisTitle();
     self._renderYAxisTitle();
-
-    self.get('dataSource');
   },
 
+  /**
+   * Renders each point found in `dataSource` as an SVG "circle" element. If `dataSource` is null,
+   * or if it contains no elements, all already-rendered points are removed.
+   */
   renderPlot: function() {
 
-    if (this.get('dataSource') && this.get('svg')) {
+    if (this.get('dataSource') && this.get('dataSource').length > 0 && this.get('svg')) {
       var $points = this.get('svg').selectAll('circle.ev-point');
 
       var xScale = this.get('xScale')(this);

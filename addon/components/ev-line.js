@@ -17,8 +17,6 @@ export default LabeledGraph.extend({
     self._renderTitle();
     self._renderXAxisTitle();
     self._renderYAxisTitle();
-
-    self.get('dataSource');
   },
 
   /**
@@ -26,6 +24,11 @@ export default LabeledGraph.extend({
    */
   sort: false,
 
+  /**
+   * Returns a d3 line function, which scaled provided points into a form which renders as an SVG "path" element.
+   * @param self
+   * @returns {*}
+   */
   line: function(self) {
 
     var xScale = self.get('xScale')(self);
@@ -38,12 +41,16 @@ export default LabeledGraph.extend({
       .y(function(d) { return yScale(d[yAttr]); });
   },
 
+  /**
+   * Renders the SVG "path" element corresponding to elements found in `dataSource`. Renders as an SVG "path" element.
+   * If `dataSource` is null, or if it contains no elements, the "path" element is removed.
+   */
   renderPlot: function() {
 
     var data = this.get('dataSource');
     var xAttr = this.get('xAttr');
 
-    if (data && this.get('svg')) {
+    if (data && data.length > 0 && this.get('svg')) {
 
       if (this.get('sort')) {
 
