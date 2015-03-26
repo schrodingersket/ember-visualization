@@ -64,6 +64,7 @@ export default Ember.Component.extend({
    */
   _initializeContainer: (function() {
     this.set('svg', d3.selectAll(this.$()).append('svg:svg')
+      .attr('xmlns', '"http://www.w3.org/2000/svg"')
       .attr('class', 'ev-svg')
       .attr('width', '100%'));
 

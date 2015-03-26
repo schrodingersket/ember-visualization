@@ -13,7 +13,7 @@ moduleForComponent('svg-container', {
 });
 
 test('it renders with svg element', function(assert) {
-  assert.expect(11);
+  assert.expect(12);
 
   // Creates the component instance
   //
@@ -53,4 +53,8 @@ test('it renders with svg element', function(assert) {
   assert.equal(element.find('svg')[0].getAttribute('viewBox'),
     '0 0 1200 800', 'svg element contains correct `viewBox` attribute after height and width update');
 
+  // Verify SVG namespace was set correctly
+  //
+  assert.equal(element.find('svg')[0].getAttribute('xmlns'), '"http://www.w3.org/2000/svg"',
+    'svg element contains correct xmlns');
 });
