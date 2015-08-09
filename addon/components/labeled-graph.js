@@ -85,21 +85,7 @@ export default SvgContainer.extend({
   base: 10,
 
   /**
-   * Specifies the JSON object value from `dataSource` to use for the x-axis.
-   *
-   * Defaults to "x."
-   */
-  xAttr: 'x',
-
-  /**
-   * Specifies the JSON object value from `dataSource` to use for the y-axis.
-   *
-   * Defaults to "y."
-   */
-  yAttr: 'y',
-
-  /**
-   * Closure which returns a d3 scaling function corresponding to `xScale`.
+   * Returns a d3 scaling function corresponding to `xScale`.
    */
   xScale: function(self) {
 
@@ -124,17 +110,22 @@ export default SvgContainer.extend({
   /**
    * Acts as the base resource for graphs to be rendered from.
    *
-   * Assuming that this instance's `xAttr` and `yAttr` attributes are set to
-   * "x" and "y" respectively, it should take the following form:
+   * It should follow the following format:
    *
    * ```
    *  [
-   *    {x: x_1, y: y_1},
-   *    {x: y_2, y: y_2},
-   *    .
-   *    .
-   *    .
-   *    {x: y_n, y: y_n}
+   *    {
+   *      label: 'Data Set 1',
+   *      color: '<color>'
+   *      data: [
+   *        {x: x_1, y: y_1},
+   *        {x: y_2, y: y_2},
+   *        .
+   *        .
+   *        .
+   *        {x: y_n, y: y_n}
+   *      ]
+   *    }
    *  ]
    * ```
    *
@@ -190,14 +181,21 @@ export default SvgContainer.extend({
    */
   _xDomain: function(self) {
 
-    var defaultData = [{}];
-    defaultData[0][self.get('xAttr')] = 0;
-    defaultData[0][self.get('yAttr')] = 0;
+    var defaultData = [{
+      label: '',
+      data: [{x: 0, y: 0}]
+    }];
 
     var data = self.get('dataSource') || defaultData;
 
-    var values = data.map(function(d) {
-      return d[self.get('xAttr')];
+    // Iterates through all x values in every data set to create an array that contains all of the mentioned x values.
+    //
+    var values = [];
+
+    data.forEach(function(dataSet) {
+      dataSet.data.forEach(function(dataPoint) {
+        values.push(dataPoint.x);
+      });
     });
 
     return d3.extent(values);
@@ -213,14 +211,21 @@ export default SvgContainer.extend({
    */
   _yDomain: function(self) {
 
-    var defaultData = [{}];
-    defaultData[0][self.get('xAttr')] = 0;
-    defaultData[0][self.get('yAttr')] = 0;
+    var defaultData = [{
+      label: '',
+      data: [{x: 0, y: 0}]
+    }];
 
     var data = self.get('dataSource') || defaultData;
 
-    var values = data.map(function(d) {
-      return d[self.get('yAttr')];
+    var values = [];
+
+    // Iterates through all y values in every data set to create an array that contains all of the mentioned y values.
+    //
+    data.forEach(function(dataSet) {
+      dataSet.data.forEach(function(dataPoint) {
+        values.push(dataPoint.y);
+      });
     });
 
     return d3.extent(values);
@@ -283,6 +288,8 @@ export default SvgContainer.extend({
       });
 
       var $xAxisTitle = this.get('svg').select('text.ev-axis-title.ev-x-axis-title');
+      var yOffset = this.get('legend') ? this.get('margin.bottom')(this) : 0;
+      var yAttr = this.get('height') - yOffset;
 
       if ($xAxisTitle.empty()) {
         this.get('svg')
@@ -290,13 +297,13 @@ export default SvgContainer.extend({
             .attr('class', 'ev-axis-title ev-x-axis-title')
             .attr('text-anchor', 'middle')
             .attr('x', (this.get('width') + this.get('margin.left')(this) - this.get('margin.right')(this))/2)
-            .attr('y', this.get('height'))
+            .attr('y', yAttr)
             .text(this.get('xAxisTitle'));
       }
       else {
         $xAxisTitle
           .attr('x', (this.get('width') + this.get('margin.left')(this) - this.get('margin.right')(this))/2)
-          .attr('y', this.get('height'))
+          .attr('y', yAttr)
           .text(this.get('xAxisTitle'));
       }
     }
@@ -424,5 +431,48 @@ export default SvgContainer.extend({
             .orient('left'));
       }
     }
-  }.observes('dataSource.[]', 'margin.left', 'margin.top', 'margin.bottom', 'margin.right')
+  }.observes('dataSource.[]', 'margin.left', 'margin.top', 'margin.bottom', 'margin.right'),
+
+  /**
+   * Renders the graph legend.
+   *
+   * @private
+   */
+  _renderLegend: function() {
+
+    var svg = this.get('svg');
+
+    // Render only if the root svg element exists and if the `legend` attribute is truth-y.
+    //
+    if (svg && this.get('legend')) {
+
+      this.set('margin.bottom', function(self) {
+        return self.get('height')/5; // Bottom margin set to 10%);
+      });
+
+      var $legend = svg.select('g.ev-legend');
+      var leftMargin = this.get('margin.left')(this);
+      var rightMargin = this.get('margin.right')(this);
+      var bottomMargin = this.get('margin.bottom')(this);
+      var width = this.get('width');
+      var height = this.get('height');
+
+      if ($legend.empty()) {
+        svg.append('g')
+          .attr('class', 'ev-legend')
+          .attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')')
+        .append('svg:rect')
+          .attr('width', width - rightMargin - leftMargin*2) // Once for margin and once for the translation
+          .attr('height', bottomMargin/3);
+      } 
+      else {
+        $legend.select('rect')
+          .attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')')
+          .attr('width', width - leftMargin*2 - rightMargin) // Once for margin and once for the translation
+          .attr('height', bottomMargin/3);
+      }
+    }
+
+    console.log('TODO: Render the legend!');
+  }.observes('dataSource.[]', 'legend')
 });

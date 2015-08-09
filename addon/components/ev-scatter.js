@@ -20,6 +20,7 @@ export default LabeledGraph.extend({
     self._renderTitle();
     self._renderXAxisTitle();
     self._renderYAxisTitle();
+    self._renderLegend();
   },
 
   /**
@@ -29,38 +30,41 @@ export default LabeledGraph.extend({
   renderPlot: function() {
 
     if (this.get('dataSource') && this.get('dataSource').length > 0 && this.get('svg')) {
-      var $points = this.get('svg').selectAll('circle.ev-point');
 
       var xScale = this.get('xScale')(this);
       var yScale = this.get('yScale')(this);
-      var xAttr = this.get('xAttr');
-      var yAttr = this.get('yAttr');
+
+      var self = this;
+
+      // Remove all points
+      //
+      this.get('svg').selectAll('circle.ev-point').remove();
+
+      var $points = this.get('svg').selectAll('circle.ev-point');
 
       // Update currently rendered points
       //
-      $points
-        .data(this.get('dataSource'))
-        .attr('cx', function(d) {
-          return xScale(d[xAttr]);
-        })
-        .attr('cy', function(d) {
-          return yScale(d[yAttr]);
-        });
+      this.get('dataSource').forEach(function(dataSet) {
 
-      // Add any new points
-      //
-      $points
-        .data(this.get('dataSource'))
-        .enter()
-      .append('svg:circle')
-        .attr('class', 'ev-point')
-        .attr('r', this.get('pointRadius'))
-        .attr('cx', function(d) {
-          return xScale(d[xAttr]);
-        })
-        .attr('cy', function(d) {
-          return yScale(d[yAttr]);
-        });
+        var color = dataSet.color || 'black';
+
+        // Add any new points
+        //
+        $points
+          .data(dataSet.data)
+          .enter()
+        .append('svg:circle')
+          .attr('data-series', 'foo')
+          .attr('class', 'ev-point')
+          .attr('r', self.get('pointRadius'))
+          .attr('cx', function(d) {
+            return xScale(d.x);
+          })
+          .attr('cy', function(d) {
+            return yScale(d.y);
+          })
+          .attr('fill', color);
+      });
     }
     else {
       // Remove when no data source is specified, if it exists.

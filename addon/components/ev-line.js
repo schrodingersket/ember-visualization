@@ -17,6 +17,7 @@ export default LabeledGraph.extend({
     self._renderTitle();
     self._renderXAxisTitle();
     self._renderYAxisTitle();
+    self._renderLegend();
   },
 
   /**
@@ -33,12 +34,10 @@ export default LabeledGraph.extend({
 
     var xScale = self.get('xScale')(self);
     var yScale = self.get('yScale')(self);
-    var xAttr = self.get('xAttr');
-    var yAttr = self.get('yAttr');
 
     return d3.svg.line()
-      .x(function(d) { return xScale(d[xAttr]); })
-      .y(function(d) { return yScale(d[yAttr]); });
+      .x(function(d) { return xScale(d.x); })
+      .y(function(d) { return yScale(d.y); });
   },
 
   /**
@@ -48,7 +47,7 @@ export default LabeledGraph.extend({
   renderPlot: function() {
 
     var data = this.get('dataSource');
-    var xAttr = this.get('xAttr');
+    var self = this;
 
     if (data && data.length > 0 && this.get('svg')) {
 
@@ -56,24 +55,35 @@ export default LabeledGraph.extend({
 
         // Sort ascending
         //
-        data.sort(function(a, b) {
-          return a[xAttr] - b[xAttr];
+        data.forEach(function(dataSet) {
+          dataSet.data.sort(function(a, b) {
+            return a.x - b.x;
+          });
         });
       }
 
       var $line = this.get('svg').selectAll('path.ev-line');
 
       if ($line.empty()) {
-        this.get('svg')
-          .append('path')
-            .attr('class', 'ev-line')
-            .attr('d', this.get('line')(this)(data))
-            .attr('stroke', 'black')
-            .attr('stroke-width', 2)
-            .attr('fill', 'none');
+        $line.data(data).enter()
+            .append('path')
+              .attr('class', 'ev-line')
+              .attr('d', function(d) {
+                return self.get('line')(self)(d.data);
+              })
+              .attr('stroke', function(d) {
+                d.color = d.color || 'black';
+
+                return d.color;
+              })
+              .attr('stroke-width', 2)
+              .attr('fill', 'none');
       }
       else {
-        $line.attr('d', this.get('line')(this)(data));
+        $line.data(data)
+          .attr('d', function(d) {
+            return self.get('line')(self)(d.data);
+          });
       }
     }
     else {
