@@ -11,7 +11,7 @@ export default Ember.Controller.extend({
 			]
 		},
 		{
-			label: 'Dummy 1',
+			label: 'Dummy 2',
 			color: 'red',
 			data: [
 				{x: -2, y: 0},

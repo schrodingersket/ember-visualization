@@ -454,17 +454,44 @@ export default SvgContainer.extend({
       var leftMargin = this.get('margin.left')(this);
       var rightMargin = this.get('margin.right')(this);
       var bottomMargin = this.get('margin.bottom')(this);
-      var width = this.get('width');
+      var plotWidth = this.get('width') - rightMargin - leftMargin*2;
       var height = this.get('height');
+      var data = this.get('dataSource') || defaultData;
 
       if ($legend.empty()) {
-        svg.append('g')
+        var $legendGroup = svg.append('g')
           .attr('class', 'ev-legend')
-          .attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')')
-        .append('svg:rect')
-          .attr('width', width - rightMargin - leftMargin*2) // Once for margin and once for the translation
-          .attr('height', bottomMargin/3);
-      } 
+          .attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')');
+
+        // Append legend boxes
+        //
+        $legendGroup.selectAll('rect').data(data).enter()
+          .append('svg:rect')
+            .attr('height', bottomMargin/6)
+            .attr('width', function() {
+              return plotWidth/(data.length * 2);
+            })
+            .attr('x', function(d, i) {
+              return (plotWidth/data.length) * i + plotWidth/40;
+            })
+            .attr('y', bottomMargin/12)
+            .style('stroke', 'none')
+            .style('fill', function(d) {
+              return d.color;
+            });
+
+        // Append legend titles
+        //
+        $legendGroup.data(data).selectAll('text').data(data).enter()
+          .append('svg:text')
+            .text(function(d) {
+              return d.label;
+            })
+            .attr('x', function(d, i) {
+              return plotWidth/(data.length * 2) * (2*i + 1) + plotWidth/30;
+            })
+            .attr('y', bottomMargin/4);
+      }
       else {
         $legend.select('rect')
           .attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')')
@@ -473,6 +500,5 @@ export default SvgContainer.extend({
       }
     }
 
-    console.log('TODO: Render the legend!');
   }.observes('dataSource.[]', 'legend')
 });
