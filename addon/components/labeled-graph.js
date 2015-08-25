@@ -450,6 +450,11 @@ export default SvgContainer.extend({
         return self.get('height')/5; // Bottom margin set to 10%);
       });
 
+      var defaultData = [{
+        label: '',
+        data: [{x: 0, y: 0}]
+      }];
+
       var $legend = svg.select('g.ev-legend');
       var leftMargin = this.get('margin.left')(this);
       var rightMargin = this.get('margin.right')(this);
@@ -495,7 +500,7 @@ export default SvgContainer.extend({
       else {
         $legend.select('rect')
           .attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')')
-          .attr('width', width - leftMargin*2 - rightMargin) // Once for margin and once for the translation
+          .attr('width', plotWidth) // Once for margin and once for the translation
           .attr('height', bottomMargin/3);
       }
     }

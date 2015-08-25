@@ -80,9 +80,14 @@ test('creates correct domains for `dataSource`', function(assert) {
   // Set `dataSource` values
   //
   var testDataSource = [
-    {x: 20, y: 70},
-    {x: 60, y: 30},
-    {x: 30, y: 80}
+    {
+      label: 'Test data source',
+      data: [
+        {x: 20, y: 70},
+        {x: 60, y: 30},
+        {x: 30, y: 80}
+      ]
+    }
   ];
 
   component.set('dataSource', testDataSource);
@@ -91,20 +96,20 @@ test('creates correct domains for `dataSource`', function(assert) {
   //
   var sutXDomain = component.get('_xDomain')(component);
 
-  assert.equal(sutXDomain[0], testDataSource[0].x,
+  assert.equal(sutXDomain[0], testDataSource[0].data[0].x,
     'returned correct start of x domain for `dataSource`');
 
-  assert.equal(sutXDomain[1], testDataSource[1].x,
+  assert.equal(sutXDomain[1], testDataSource[0].data[1].x,
     'returned correct end of x domain for `dataSource`');
 
   // Assert that the domain returned by `_yDomain` is correct
   //
   var sutYDomain = component.get('_yDomain')(component);
 
-  assert.equal(sutYDomain[0], testDataSource[1].y,
+  assert.equal(sutYDomain[0], testDataSource[0].data[1].y,
     'returned correct start of y domain for `dataSource`');
 
-  assert.equal(sutYDomain[1], testDataSource[2].y,
+  assert.equal(sutYDomain[1], testDataSource[0].data[2].y,
     'returned correct end of y domain for `dataSource`');
 });
 
@@ -229,9 +234,14 @@ test('returns scale with correct domain and range for `_xScale`', function(asser
   // Set `dataSource` values
   //
   var testDataSource = [
-    {x: 10, y: 20},
-    {x: 20, y: 30},
-    {x: 30, y: 60}
+    {
+      label: 'Test data',
+      data: [
+        {x: 10, y: 20},
+        {x: 20, y: 30},
+        {x: 30, y: 60}
+      ]
+    }
   ];
 
   component.set('dataSource', testDataSource);
@@ -273,9 +283,14 @@ test('returns scale with correct domain and range for `_yScale`', function(asser
   // Set `dataSource` values
   //
   var testDataSource = [
-    {x: 10, y: 20},
-    {x: 20, y: 30},
-    {x: 30, y: 60}
+    {
+      label: 'Test data',
+      data: [
+        {x: 10, y: 20},
+        {x: 20, y: 30},
+        {x: 30, y: 60}
+      ]
+    }
   ];
 
   component.set('dataSource', testDataSource);
@@ -456,9 +471,14 @@ test('x-axis renders with correct translation', function(assert) {
   // Set `dataSource` values to generate x-axis from.
   //
   var testDataSource = [
-    {x: 10, y: 20},
-    {x: 20, y: 30},
-    {x: 30, y: 60}
+    {
+      label: 'Test data',
+      data: [
+        {x: 10, y: 20},
+        {x: 20, y: 30},
+        {x: 30, y: 60}
+      ]
+    }
   ];
 
   component.set('dataSource', testDataSource);
@@ -494,9 +514,14 @@ test('y-axis renders with correct translation', function(assert) {
   // Set `dataSource` values to generate x-axis from.
   //
   var testDataSource = [
-    {x: 10, y: 20},
-    {x: 20, y: 30},
-    {x: 30, y: 60}
+    {
+      label: 'Test data',
+      data: [
+        {x: 10, y: 20},
+        {x: 20, y: 30},
+        {x: 30, y: 60}
+      ]
+    }
   ];
 
   component.set('dataSource', testDataSource);

@@ -13,7 +13,7 @@ moduleForComponent('svg-container', {
 });
 
 test('it renders with svg element', function(assert) {
-  assert.expect(12);
+  assert.expect(11);
 
   // Creates the component instance
   //
@@ -35,8 +35,7 @@ test('it renders with svg element', function(assert) {
 
   // Verify SVG dimensions are equal to the container's dimensions
   //
-  assert.equal(element.find('svg').width(), element.width());
-  assert.equal(element.find('svg').height(), element.height() - 4);
+  assert.equal(element.find('svg').width(), element.width(), 'width is equal');
 
   // Verify that the component's width and height elements were set properly
   //

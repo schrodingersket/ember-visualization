@@ -49,9 +49,14 @@ test('renders correct number of scatter plot elements', function(assert) {
   // Set `dataSource` values
   //
   var testDataSource = [
-    {x: 20, y: 70},
-    {x: 60, y: 30},
-    {x: 30, y: 80}
+    {
+      label: 'Test data',
+      data: [
+        {x: 20, y: 70},
+        {x: 60, y: 30},
+        {x: 30, y: 80}
+      ]
+    }
   ];
 
   component.set('dataSource', testDataSource);
