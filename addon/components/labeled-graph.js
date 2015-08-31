@@ -455,7 +455,6 @@ export default SvgContainer.extend({
         data: [{x: 0, y: 0}]
       }];
 
-      var $legend = svg.select('g.ev-legend');
       var leftMargin = this.get('margin.left')(this);
       var rightMargin = this.get('margin.right')(this);
       var bottomMargin = this.get('margin.bottom')(this);
@@ -463,46 +462,74 @@ export default SvgContainer.extend({
       var height = this.get('height');
       var data = this.get('dataSource') || defaultData;
 
-      if ($legend.empty()) {
-        var $legendGroup = svg.append('g')
-          .attr('class', 'ev-legend')
-          .attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')');
 
-        // Append legend boxes
-        //
-        $legendGroup.selectAll('rect').data(data).enter()
-          .append('svg:rect')
-            .attr('height', bottomMargin/6)
-            .attr('width', function() {
-              return plotWidth/(data.length * 2);
-            })
-            .attr('x', function(d, i) {
-              return (plotWidth/data.length) * i + plotWidth/40;
-            })
-            .attr('y', bottomMargin/12)
-            .style('stroke', 'none')
-            .style('fill', function(d) {
-              return d.color;
-            });
+      var $legendGroup = svg.select('g.ev-legend');
 
-        // Append legend titles
-        //
-        $legendGroup.data(data).selectAll('text').data(data).enter()
-          .append('svg:text')
-            .text(function(d) {
-              return d.label;
-            })
-            .attr('x', function(d, i) {
-              return plotWidth/(data.length * 2) * (2*i + 1) + plotWidth/30;
-            })
-            .attr('y', bottomMargin/4);
+      if ($legendGroup.empty()) {
+        $legendGroup = svg.append('g')
+          .attr('class', 'ev-legend');
       }
-      else {
-        $legend.select('rect')
-          .attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')')
-          .attr('width', plotWidth) // Once for margin and once for the translation
-          .attr('height', bottomMargin/3);
-      }
+
+      $legendGroup.attr('transform', 'translate(' + leftMargin + ',' + (height - bottomMargin/3) + ')');
+
+      var legendGroupTextData = $legendGroup.selectAll('text').data(data);
+      var legendGroupRectData = $legendGroup.selectAll('rect').data(data);
+
+      // Specify data removal action
+      //
+      legendGroupTextData.exit().remove();
+      legendGroupRectData.exit().remove();
+
+      // Modify existing data
+      //
+      legendGroupRectData
+        .attr('height', bottomMargin/6)
+        .attr('width', function() {
+          return plotWidth/(data.length * 2);
+        })
+        .attr('x', function(d, i) {
+          return (plotWidth/data.length) * i + plotWidth/40;
+        })
+        .attr('y', bottomMargin/12);
+
+      legendGroupTextData
+        .text(function(d) {
+          return d.label;
+        })
+        .attr('x', function(d, i) {
+          return plotWidth/(data.length * 2) * (2*i + 1) + plotWidth/30;
+        })
+        .attr('y', bottomMargin/4);
+
+
+      // Append legend boxes
+      //
+      legendGroupRectData.enter()
+        .append('svg:rect')
+          .attr('height', bottomMargin/6)
+          .attr('width', function() {
+            return plotWidth/(data.length * 2);
+          })
+          .attr('x', function(d, i) {
+            return (plotWidth/data.length) * i + plotWidth/40;
+          })
+          .attr('y', bottomMargin/12)
+          .style('stroke', 'none')
+          .style('fill', function(d) {
+            return d.color;
+          });
+
+      // Append legend titles
+      //
+      legendGroupTextData.enter()
+        .append('svg:text')
+          .text(function(d) {
+            return d.label;
+          })
+          .attr('x', function(d, i) {
+            return plotWidth/(data.length * 2) * (2*i + 1) + plotWidth/30;
+          })
+          .attr('y', bottomMargin/4);
     }
 
   }.observes('dataSource.[]', 'legend')

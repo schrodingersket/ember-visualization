@@ -63,28 +63,35 @@ export default LabeledGraph.extend({
       }
 
       var $line = this.get('svg').selectAll('path.ev-line');
+      var lineData = $line.data(data);
 
-      if ($line.empty()) {
-        $line.data(data).enter()
-            .append('path')
-              .attr('class', 'ev-line')
-              .attr('d', function(d) {
-                return self.get('line')(self)(d.data);
-              })
-              .attr('stroke', function(d) {
-                d.color = d.color || 'black';
+      // Handle data exit
+      //
+      lineData.exit().remove();
 
-                return d.color;
-              })
-              .attr('stroke-width', 2)
-              .attr('fill', 'none');
-      }
-      else {
-        $line.data(data)
-          .attr('d', function(d) {
-            return self.get('line')(self)(d.data);
-          });
-      }
+      // Modify existing plot
+      //
+      lineData.attr('d', function(d) {
+        return self.get('line')(self)(d.data);
+      });
+
+      // Handle data entry
+      //
+      lineData.enter()
+          .append('path')
+            .attr('class', 'ev-line')
+            .attr('d', function(d) {
+              return self.get('line')(self)(d.data);
+            })
+            .attr('stroke', function(d) {
+              d.color = d.color || 'black';
+
+              return d.color;
+            })
+            .attr('stroke-width', 2)
+            .attr('fill', 'none');
+
+
     }
     else {
       // Remove when no data source is specified, if it exists.
